@@ -70,7 +70,7 @@ DOWNLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # Telegram Bot API file size limit (bytes). Default: 50 MB.
 # If you run a local Bot API server, set this to 2_000_000_000.
-TG_MAX_BYTES = 50 * 1024 * 1024
+TG_MAX_BYTES = 2_000_000_000
 
 logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -929,13 +929,15 @@ def main():
     print("  ╚═══════════════════════════════════════════════╝\n")
 
     app = (
-        Application.builder()
-        .token(BOT_TOKEN)
-        .read_timeout(60)
-        .write_timeout(120)
-        .connect_timeout(30)
-        .pool_timeout(30)
-        .build()
+         Application.builder()
+    .token(BOT_TOKEN)
+    .base_url("http://telegram-bot-api.railway.internal:8081/bot")
+    .local_mode(True)
+    .read_timeout(60)
+    .write_timeout(120)
+    .connect_timeout(30)
+    .pool_timeout(30)
+    .build()
     )
 
     app.add_handler(CommandHandler("start", cmd_start))
