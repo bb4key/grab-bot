@@ -36,6 +36,8 @@ import uuid
 import zipfile
 from pathlib import Path
 
+
+
 import yt_dlp
 from telegram import (
     Bot,
@@ -43,6 +45,10 @@ from telegram import (
     InlineKeyboardMarkup,
     Update,
 )
+
+import static_ffmpeg
+static_ffmpeg.add_paths()
+
 from telegram.constants import ParseMode
 from telegram.ext import (
     Application,
