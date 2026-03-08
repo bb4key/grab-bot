@@ -1,0 +1,1 @@
+worker: python tg_grab_bot.py

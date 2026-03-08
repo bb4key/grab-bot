@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["ffmpeg", "python311"]
+```
+
+Структура папки:
+```
+my-grab-bot/
+├── tg_grab_bot.py
+├── requirements.txt
+├── Procfile
+└── nixpacks.toml
