@@ -1,2 +1,6 @@
 python-telegram-bot==21.6
-yt-dlpstatic-ffmpeg
+
+yt-dlp
+
+static-ffmpeg
+
