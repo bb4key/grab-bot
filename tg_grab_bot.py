@@ -860,34 +860,33 @@ async def handle_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             + f"\n💾 {job.size_str}"
         )
 
-        with open(job.file, "rb") as fh:
-            if job.mode == "mp4" and platform in ("yt", "tt", "ig"):
-                await ctx.bot.send_video(
-                    chat_id=chat_id,
-                    video=fh,
-                    filename=job.filename,
-                    caption=caption,
-                    parse_mode=ParseMode.MARKDOWN,
-                    supports_streaming=True,
-                )
-            elif job.mime == "audio/mpeg":
-                await ctx.bot.send_audio(
-                    chat_id=chat_id,
-                    audio=fh,
-                    filename=job.filename,
-                    title=job.title or job.filename,
-                    caption=caption,
-                    parse_mode=ParseMode.MARKDOWN,
-                )
-            else:
-                # zip or mkv
-                await ctx.bot.send_document(
-                    chat_id=chat_id,
-                    document=fh,
-                    filename=job.filename,
-                    caption=caption,
-                    parse_mode=ParseMode.MARKDOWN,
-                )
+    with open(job.file, "rb") as fh:
+        if job.mode == "mp4" and platform in ("yt", "tt", "ig"):
+            await ctx.bot.send_document(
+                chat_id=chat_id,
+                document=fh,
+                filename=job.filename,
+                caption=caption,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+        elif job.mime == "audio/mpeg":
+            await ctx.bot.send_audio(
+                chat_id=chat_id,
+                audio=fh,
+                filename=job.filename,
+                title=job.title or job.filename,
+                caption=caption,
+                parse_mode=ParseMode.MARKDOWN,
+            )
+        else:
+            # zip or mkv
+            await ctx.bot.send_document(
+                chat_id=chat_id,
+                document=fh,
+                filename=job.filename,
+                caption=caption,
+                parse_mode=ParseMode.MARKDOWN,
+            )
 
         # Delete the "uploading" status message
         try:
