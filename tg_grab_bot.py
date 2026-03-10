@@ -860,33 +860,54 @@ async def handle_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             + f"\n💾 {job.size_str}"
         )
 
-    with open(job.file, "rb") as fh:
-        if job.mode == "mp4" and platform in ("yt", "tt", "ig"):
-            await ctx.bot.send_document(
-                chat_id=chat_id,
-                document=fh,
-                filename=job.filename,
-                caption=caption,
-                parse_mode=ParseMode.MARKDOWN,
-            )
-        elif job.mime == "audio/mpeg":
-            await ctx.bot.send_audio(
-                chat_id=chat_id,
-                audio=fh,
-                filename=job.filename,
-                title=job.title or job.filename,
-                caption=caption,
-                parse_mode=ParseMode.MARKDOWN,
-            )
-        else:
-            # zip or mkv
-            await ctx.bot.send_document(
-                chat_id=chat_id,
-                document=fh,
-                filename=job.filename,
-                caption=caption,
-                parse_mode=ParseMode.MARKDOWN,
-            )
+        # Get native video dimensions so Telegram renders correct aspect ratio
+        vid_width, vid_height = 0, 0
+        if job.mode == "mp4" and job.file:
+            import subprocess
+            try:
+                r = subprocess.run([
+                    "ffprobe", "-v", "error",
+                    "-select_streams", "v:0",
+                    "-show_entries", "stream=width,height",
+                    "-of", "csv=p=0",
+                    str(job.file)
+                ], capture_output=True, text=True)
+                parts = r.stdout.strip().split(",")
+                if len(parts) == 2:
+                    vid_width, vid_height = int(parts[0]), int(parts[1])
+            except Exception:
+                pass
+
+        with open(job.file, "rb") as fh:
+            if job.mode == "mp4" and platform in ("yt", "tt", "ig"):
+                await ctx.bot.send_video(
+                    chat_id=chat_id,
+                    video=fh,
+                    filename=job.filename,
+                    caption=caption,
+                    parse_mode=ParseMode.MARKDOWN,
+                    supports_streaming=True,
+                    width=vid_width or None,
+                    height=vid_height or None,
+                )
+            elif job.mime == "audio/mpeg":
+                await ctx.bot.send_audio(
+                    chat_id=chat_id,
+                    audio=fh,
+                    filename=job.filename,
+                    title=job.title or job.filename,
+                    caption=caption,
+                    parse_mode=ParseMode.MARKDOWN,
+                )
+            else:
+                # zip or mkv
+                await ctx.bot.send_document(
+                    chat_id=chat_id,
+                    document=fh,
+                    filename=job.filename,
+                    caption=caption,
+                    parse_mode=ParseMode.MARKDOWN,
+                )
 
         # Delete the "uploading" status message
         try:
